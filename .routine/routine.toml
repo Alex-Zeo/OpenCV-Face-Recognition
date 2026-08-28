@@ -1,0 +1,22 @@
+# .routine/routine.toml
+model = "claude-sonnet-5"
+model_version = "2026-05"
+triggers = ["merge:master", "ci-green:master"]
+heartbeat_cron = "30 15 * * 1"
+allowed_tools = ["Bash", "Read", "Edit", "Write", "Grep", "Glob"]
+tau = 0.12
+k = 5
+
+[budget]
+per_fire = 250000
+per_day = 1000000
+
+[gates]
+checks = [
+  "python -m pip install -r requirements.txt",
+  "python -c \"import FacialRecognition\"",
+  "pytest -q",
+]
+[gates.axes]
+correctness = "pytest -q -k accuracy"
+quality = "ruff check ."
