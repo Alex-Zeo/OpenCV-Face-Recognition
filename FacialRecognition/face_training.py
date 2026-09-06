@@ -23,11 +23,21 @@ def build_face_detector():
     return cv2.CascadeClassifier(CASCADE_PATH)
 
 
+_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")
+
+
 def get_images_and_labels(path, detector):
     """Read dataset images from path, detect the face crop in each, and
     return (face_samples, ids) suitable for LBPHFaceRecognizer.train().
+
+    Non-image files in the dataset directory (e.g. .DS_Store) are skipped
+    rather than raising, since the "User.<id>.<count>.<ext>" naming scheme
+    is the only place an id is encoded.
     """
-    image_paths = [os.path.join(path, f) for f in os.listdir(path)]
+    image_paths = [
+        os.path.join(path, f) for f in os.listdir(path)
+        if f.lower().endswith(_IMAGE_EXTENSIONS)
+    ]
     face_samples = []
     ids = []
 

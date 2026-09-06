@@ -52,3 +52,13 @@ def test_get_images_and_labels_handles_empty_dataset_dir(tmp_path):
     faces, ids = get_images_and_labels(str(tmp_path), build_face_detector())
     assert faces == []
     assert ids == []
+
+
+def test_get_images_and_labels_skips_non_image_files(tmp_path):
+    # A stray non-image file (e.g. .DS_Store) must be skipped rather than
+    # raising when the id is parsed from the "User.<id>.<count>.<ext>" name.
+    from FacialRecognition.face_training import build_face_detector, get_images_and_labels
+    (tmp_path / ".DS_Store").write_bytes(b"not an image")
+    faces, ids = get_images_and_labels(str(tmp_path), build_face_detector())
+    assert faces == []
+    assert ids == []
