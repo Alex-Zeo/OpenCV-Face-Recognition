@@ -1,0 +1,35 @@
+name: tests
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  tests:
+    if: vars.HETZNER_RUNNER == 'true'
+    runs-on: [self-hosted, hetzner]
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create a workspace virtualenv
+        run: python3 -m venv .venv
+      - name: Install project and pytest
+        run: |
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python -m pip install pytest
+      - name: Run tests
+        run: |
+          . .venv/bin/activate
+          if [ ! -d tests ]; then echo 'no tests directory on this ref, nothing to run'; exit 0; fi
+          pytest -q
