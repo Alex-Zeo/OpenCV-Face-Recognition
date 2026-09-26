@@ -12,8 +12,10 @@ concurrency:
 
 jobs:
   tests:
-    if: vars.HETZNER_RUNNER == 'true'
-    runs-on: [self-hosted, hetzner]
+    # A public repository must not run pull requests on the shared Hetzner runner:
+    # anyone who opens one could execute code there, and that runner user can reach
+    # root through docker. Hosted minutes are free for public repositories.
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
       run:
