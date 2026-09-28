@@ -55,12 +55,16 @@ def get_images_and_labels(path, detector):
     return face_samples, ids
 
 
-def train_recognizer(dataset_dir="dataset", trainer_path="trainer/trainer.yml"):
+def train_recognizer(dataset_dir="dataset", trainer_path="trainer/trainer.yml", detector=None):
     """Train an LBPH recognizer on dataset_dir and write it to trainer_path.
+
+    ``detector`` defaults to the package's Haar cascade but can be swapped
+    (e.g. in tests) for a stub that skips real face detection, since this
+    function's job is the train/write round trip, not detection accuracy.
 
     Returns (recognizer, num_unique_ids).
     """
-    detector = build_face_detector()
+    detector = detector or build_face_detector()
     recognizer = cv2.face.LBPHFaceRecognizer_create()
 
     faces, ids = get_images_and_labels(dataset_dir, detector)
