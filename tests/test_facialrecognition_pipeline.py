@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from FacialRecognition.face_dataset import capture_faces
-from FacialRecognition.face_training import train_recognizer
 from FacialRecognition.face_recognition import load_recognizer, recognize_face
+from FacialRecognition.face_training import train_recognizer
 
 
 class _StubCam:
@@ -81,7 +81,7 @@ def two_id_dataset(tmp_path, monkeypatch):
         Image.fromarray(_solid_gray_image(30)).save(dataset_dir / f"User.1.{count}.jpg")
         Image.fromarray(_solid_gray_image(220)).save(dataset_dir / f"User.2.{count}.jpg")
 
-    import FacialRecognition.face_training as face_training
+    from FacialRecognition import face_training
     monkeypatch.setattr(face_training, "build_face_detector", lambda: _StubDetector())
     return dataset_dir
 
@@ -89,7 +89,7 @@ def two_id_dataset(tmp_path, monkeypatch):
 def test_train_recognizer_trains_on_dataset_and_writes_trainer_file(tmp_path, two_id_dataset):
     trainer_path = tmp_path / "trainer" / "trainer.yml"
 
-    recognizer, num_ids = train_recognizer(
+    _recognizer, num_ids = train_recognizer(
         dataset_dir=str(two_id_dataset), trainer_path=str(trainer_path),
     )
 
